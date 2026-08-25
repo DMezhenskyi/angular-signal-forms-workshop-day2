@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, linkedSignal, output, resource, Signal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, output } from '@angular/core';
 import { disabled, email, form, FormField, max, min, required, provideSignalFormsConfig, applyEach, maxLength, hidden, pattern, validate, validateTree, validateHttp, validateAsync, debounce, FormRoot } from '@angular/forms/signals';
 import { inspectFormState } from '@features/form-inspector/form-connector';
 
@@ -11,12 +11,14 @@ import { Attendee } from './attendee/attendee';
 import { TAX_ID_RULES, VatCheckResult } from './company/company';
 import { EmailCheckResult } from './customer/customer';
 import { CustomerForm } from './customer/customer-form';
+import { CompanyForm } from './company/company-form';
+import { AttendeeConfiguratorForm } from './attendee/attendee-configurator/attendee-configurator-form';
 
 @Component({
   selector: 'df-order-form',
   styleUrls: ['./order-form.scss', './form-core.scss'],
   templateUrl: './order-form.html',
-  imports: [FormField, FormRoot, CustomerForm],
+  imports: [FormField, FormRoot, CustomerForm, CompanyForm, AttendeeConfiguratorForm],
   providers: [
     provideSignalFormsConfig({
       classes: {
@@ -206,18 +208,6 @@ export class OrderForm {
 
   constructor() {
     inspectFormState(this.form);
-  }
-
-  protected addAttendee() {
-    this.form.attendees.list().value.update(
-      (list) => [...list, { email: '', level: 'junior' }]
-    );
-  }
-
-  protected removeAttendee(index: number) {
-    this.form.attendees.list().value.update(
-      (list) => list.filter((_, i) => i !== index)
-    );
   }
 }
 

@@ -1,130 +1,15 @@
 <form class="checkout-form" [formRoot]="form">
   <df-customer-form [form]="form.customer" />
-  <!--
-    TODO: Task 2: Move the attendee block into <df-attendee-configurator-form> (~12 min)
 
-    Your job:
-      - Move the Attendee Count field and the whole <section class="attendees">
-        into the template of AttendeeConfiguratorForm. Move the row markup as it is,
-        Task 2 splits it.
-      - Move addAttendee() and removeAttendee() into that component too.
-      - In the child, read the fields from its `form` input instead of
-        `form.attendees`.
-      - Render <df-attendee-configurator-form [form]="form.attendees" /> here, and add
-        the component to the `imports` of OrderForm.
+  <df-attendee-configurator-form [form]="form.attendees" />
 
-    NOTE: do not change the schema in order-form.ts.
-
-    References:
-      - https://angular.dev/api/forms/signals/FieldTree
-      - https://angular.dev/guide/forms/signals/field-state-management#accessing-field-state
-      - https://angular.dev/guide/components/inputs#required-inputs
-  -->
-  <div class="form-field">
-    <label for="attendee-count">Attendee Count</label>
-    <input [formField]="form.attendees.count" id="attendee-count" type="number" class="form-control" />
-    @if (form.attendees.count().touched()) {
-      @for (error of form.attendees.count().errors(); track error.kind) {
-        <span class="error-message">{{ error.message }}</span>
-      }
-    }
-  </div>
-  <section class="attendees">
-    <button type="button" (click)="addAttendee()" [disabled]="form.attendees.count().invalid()">+</button>
-
-    <div class="attendees-container">
-      @for (attendee of form.attendees.list; track attendee) {
-        <div class="attendee-row">
-          <div class="form-field auto-width auto-height">
-            <select [formField]="attendee.level">
-              <option value="junior">Junior</option>
-              <option value="middle">Middle</option>
-              <option value="senior">Senior</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <input [formField]="attendee.email" placeholder="Attendee's Email" type="text" class="form-control" />
-            @if (attendee.email().touched()) {
-              @for (error of attendee.email().errors(); track error.kind) {
-                <span class="error-message">{{ error.message }}</span>
-              }
-            }
-          </div>
-          <button (click)="removeAttendee($index)" type="button" class="delete">-</button>
-        </div>
-      } @empty {
-        <div class="no-data">No attendees yet...</div> 
-      }      
-    </div>
-      @for (error of form.attendees.list().errors(); track error.kind) {
-        <span class="error-message">{{ error.message }}</span>
-      }
-  </section>
   <div class="form-field business-toggle inline auto-height reversed">
     <label for="business-purchase">Business Purchase</label>
     <input [formField]="form.businessPurchase" id="business-purchase" type="checkbox" class="form-control" />
   </div>
+  
   @if (!form.company().hidden()) {
-    <!--
-      TODO: Task 1: Move the company block into <df-company-form> (~8 min)
-
-      Your job:
-        - Move the whole <fieldset> into the template of CompanyForm
-          (company/company-form.ts) and read the fields from its `form` input.
-        - Render <df-company-form [form]="form.company" /> here, inside this @if.
-        - Keep the @if (!form.company().hidden()) in this file. The parent decides
-          what to render, the child only draws the fields.
-
-      NOTE: do not change the schema in order-form.ts. Splitting the view does not split the form. The child gets a branch of the same FieldTree.
-
-      References:
-        - https://angular.dev/guide/forms/signals/field-state-management#hidden-fields
-        - https://angular.dev/guide/forms/signals/field-state-management#conditional-error-display
-        - https://angular.dev/guide/forms/signals/form-logic#disabled-reasons
-    -->
-    <fieldset>
-      <legend>Company Information</legend>
-      <div class="form-field">
-        <label for="company-name">Company Name</label>
-        <input [formField]="form.company.name" id="company-name" type="text" class="form-control" placeholder="E.g. Apple Inc." />
-        @if (form.company.name().touched()) {
-          @for (error of form.company.name().errors(); track error.kind) {
-            <span class="error-message">{{ error.message }}</span>
-          }
-        }
-      </div>
-      <div class="form-field-group">
-        <div class="form-field">
-          <label for="country">Country</label>
-          <select [formField]="form.company.country" id="country" class="form-control">
-            <option value="">Select country</option>
-            <option value="DE">Germany</option>
-            <option value="AT">Austria</option>
-            <option value="CH">Switzerland</option>
-            <option value="CA">Canada</option>
-            <option value="US">United States</option>
-            <option value="OTHER">Other</option>
-          </select>
-        </div>
-        @if (!form.company.taxId().hidden()) {
-          <div class="form-field">
-            <label for="tax-id">Tax / VAT ID</label>
-            <input [formField]="form.company.taxId" id="tax-id" type="text" class="form-control" placeholder="E.g. DE123456789" />
-            @if (form.company.taxId().touched()) {
-              @for (error of form.company.taxId().errors(); track error.kind) {
-                <span class="error-message">{{ error.message }}</span>
-              }
-            }
-            @for (reason of form.company.taxId().disabledReasons(); track reason) {
-              <span class="info-message">{{ reason.message }}</span>
-            }
-            @if (form.company.taxId().pending()) {
-              <span class="info-message">Checking the TAX ID...</span>
-            }
-          </div>
-        }
-      </div>
-    </fieldset>
+    <df-company-form [form]="form.company" />
   }
   @for (error of form().errors(); track error.kind) {
     <div class="error-banner">{{ error.message }}</div>
@@ -133,8 +18,3 @@
     <button class="submit-button" [disabled]="form().submitting()" type="submit">{{ buttonText() }}</button>
   </section>
 </form>
-<!--
-    TODO TASK 4* 
-    You should do nothing here, but think how we could force API consistency
-    and predictability for our sub-forms    
--->
