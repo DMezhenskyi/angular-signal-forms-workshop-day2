@@ -1,34 +1,5 @@
 <form class="checkout-form" [formRoot]="form">
-  <div class="form-field">
-    <label for="first-name">First Name</label>
-    <input [formField]="form.customer.firstName" id="first-name" type="text" class="form-control" placeholder="E.g. Albert" />
-    @if (form.customer.firstName().touched()) {
-      @for (error of form.customer.firstName().errors(); track error.kind) {
-        <span class="error-message">{{ error.message }}</span>
-      }
-    }
-  </div>
-  <div class="form-field">
-    <label for="last-name">Last Name</label>
-    <input [formField]="form.customer.lastName" id="last-name" type="text" class="form-control" placeholder="E.g. Einstein" />
-    @if (form.customer.lastName().touched()) {
-      @for (error of form.customer.lastName().errors(); track error.kind) {
-        <span class="error-message">{{ error.message }}</span>
-      }
-    }
-  </div>
-  <div class="form-field">
-    <label for="email">Email</label>
-    <input [formField]="form.customer.email" id="email" type="email" class="form-control" placeholder="E.g. example@example.com" />
-    @if (form.customer.email().touched()) {
-      @for (error of form.customer.email().errors(); track error.kind) {
-        <span class="error-message">{{ error.message }}</span>
-      }
-    }
-    @if (form.customer.email().pending()) {
-      <span class="info-message">Checking email availability...</span>
-    }
-  </div>
+  <df-customer-form [form]="form.customer" />
   <div class="form-field">
     <label for="attendee-count">Attendee Count</label>
     <input [formField]="form.attendees.count" id="attendee-count" type="number" class="form-control" />

@@ -10,12 +10,13 @@ import { HttpContext, HttpErrorResponse } from '@angular/common/http';
 import { Attendee } from './attendee/attendee';
 import { TAX_ID_RULES, VatCheckResult } from './company/company';
 import { EmailCheckResult } from './customer/customer';
+import { CustomerForm } from './customer/customer-form';
 
 @Component({
   selector: 'df-order-form',
   styleUrls: ['./order-form.scss', './form-core.scss'],
   templateUrl: './order-form.html',
-  imports: [FormField, FormRoot],
+  imports: [FormField, FormRoot, CustomerForm],
   providers: [
     provideSignalFormsConfig({
       classes: {
