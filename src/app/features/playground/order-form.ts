@@ -1,0 +1,231 @@
+import { Component, computed, inject, input, linkedSignal, output, resource, Signal } from '@angular/core';
+import { disabled, email, form, FormField, max, min, required, provideSignalFormsConfig, applyEach, maxLength, hidden, pattern, validate, validateTree, validateHttp, validateAsync, debounce, FormRoot } from '@angular/forms/signals';
+import { inspectFormState } from '@features/form-inspector/form-connector';
+
+import { Attendee, EmailCheckResult, INITIAL_ORDER_VALUES, Order, TAX_ID_RULES, VatCheckResult } from './order';
+import { OrderApi } from './order-api';
+import { EMAIL_SIMULATION_MODE, VAT_SIMULATION_MODE } from '@core/http/simulation-mode';
+import { ApiError } from '@core/http/model';
+import { HttpContext, HttpErrorResponse } from '@angular/common/http';
+
+@Component({
+  selector: 'df-order-form',
+  styleUrls: ['./order-form.scss', './form-core.scss'],
+  templateUrl: './order-form.html',
+  imports: [FormField, FormRoot],
+  providers: [
+    provideSignalFormsConfig({
+      classes: {
+        'invalid': ({ state }) => state().touched() && state().invalid(), 
+      },
+    }),
+  ],
+})
+export class OrderForm {
+  readonly order = input<Order>();
+  readonly submitted = output<Order>();
+
+  #orderApi = inject(OrderApi);
+
+  #model = linkedSignal(
+    () => this.order() ?? structuredClone(INITIAL_ORDER_VALUES)
+  );
+
+  protected readonly form = form(
+    this.#model, (path) => {
+      required(path.customer.firstName, { message: `This field is required`});
+      required(path.customer.lastName, { message: `This field is required`});
+      required(path.customer.email, { message: `This field is required`});
+      email(path.customer.email, { message: `Please enter a valid email address` });
+      validateHttp<string, EmailCheckResult>(path.customer.email, {
+        request: (ctx) => ({
+          url: `/user/email/check?email=${ctx.value()}`,
+          context: new HttpContext().set(EMAIL_SIMULATION_MODE, 'allowed')
+        }),
+        onSuccess: (result, ctx) => {
+          if (!result.allowed) {
+            return ({
+              kind: 'email-taken',
+              message: result.reason ?? `This email is already taken`,
+            });
+          }
+          return;
+        },
+        onError: () => {
+          return ({
+            kind: 'email-taken-network-error',
+            message: `Network error while checking email availability`,
+          })
+          
+        }
+      }),
+      required(path.attendees.count, { message: `This field is required` });
+      min(path.attendees.count, 1, { message: (ctx) => `Minimum ${ctx.state.min?.()} attendee` });
+      max(path.attendees.count, 10, {
+        message: ({ value, state }) => `${value()} attendees? We only have ${state.max?.()} seats`,
+      });
+      applyEach(path.attendees.list, (attendeePath) => {
+        required(attendeePath.email, { message: `Attendee email is required` });
+        email(attendeePath.email, { message: `Enter a valid email address` });
+      })
+      maxLength(path.attendees.list,
+        ({ valueOf }) => valueOf(path.attendees.count) ?? undefined,
+        {
+          message: ({ state }) => `You can only add ${state.maxLength?.()} attendees`,
+        }
+      ),
+      validateTree(path.attendees.list, (ctx) => {
+        const duplicatedEmailIndexes = findDuplicateEmails(ctx.value());
+        
+        // No duplicates found, exit validation with success
+        if (duplicatedEmailIndexes.length === 0) {
+          return;
+        }
+
+        const duplicatedEmailErrors = duplicatedEmailIndexes
+          .map((index) => ({
+            kind: 'duplicated-attendee',
+            message: `This attendee is already added`,
+            fieldTree: ctx.fieldTree[index]?.email,
+        }));
+        
+        return [
+          ...duplicatedEmailErrors,
+          {
+            kind: 'duplicates-in-list',
+            message: `The list contains duplicated emails`,
+            fieldTree: ctx.fieldTree,
+          }
+        ];
+      }),
+      hidden(path.company, {
+        when: ({ valueOf }) => !valueOf(path.businessPurchase),
+      });
+      required(path.company.name,
+        {
+          when: ({ valueOf }) => valueOf(path.businessPurchase),
+          message: `This field is required`
+        }
+      );
+      pattern(path.company.taxId, ({valueOf}) => {
+        const country = valueOf(path.company.country);
+        const TAX_ID_KEY = ['AT', 'DE', 'CH'].includes(country) ? 'EU_VAT' : country;
+        return TAX_ID_RULES[TAX_ID_KEY]?.pattern;
+      }, {
+        message: `Doesn't match the format`,
+      }),
+      validate(path.company.taxId, (ctx) => {
+        const countryPrefix = ctx.valueOf(path.company.country);
+
+        // Not an EU/VAT country, no need to validate
+        if (!['AT', 'DE', 'CH'].includes(countryPrefix)) {
+          return;
+        }
+        // Empty value is the job of required(), not of this validator
+        if (!ctx.value()) {
+          return;
+        }
+        // VAT starts with a proper country ISO code -> exit validation with success
+        if (ctx.value().toUpperCase().startsWith(countryPrefix)) {
+          return;
+        }
+        
+        return {
+          kind: 'vat-starts-with',
+          message: `VAT should start with country ISO code ${countryPrefix}`,
+        }
+      }),
+      disabled(path.company.taxId, {
+        when: ({ valueOf }) => {
+          const country = valueOf(path.company.country);
+          return country === 'OTHER' ? `B2B purchase isn't available for other countries` : false;
+        }
+      });
+      hidden(path.company.taxId, {
+        when: ({ valueOf }) => valueOf(path.company.country) === '',
+      });
+      debounce(path.company.taxId, 'blur'),
+      validateHttp<string, VatCheckResult>(path.company.taxId, {
+        request: (ctx) => {
+          return ({
+            url: `/company/tax/verify?country=${ctx.valueOf(path.company.country)}&taxId=${ctx.value()}`,
+            context: new HttpContext().set(VAT_SIMULATION_MODE, 'valid')
+          })
+        },
+        onSuccess: (result) => {
+          if (!result.valid) {
+            return ({
+              kind: 'tax-registry-not-found',
+              message: result.reason ?? `No such Tax ID in the registry`,
+            });
+          }
+          return;
+        },
+        onError: () => {
+          return ({
+            kind: 'tax-registry-network-error',
+            message: `Network error while checking the Tax ID registry`,
+          })
+        },
+        when: (ctx) => !!ctx.value() && ['AT', 'DE', 'CH'].includes(ctx.valueOf(path.company.country))
+      })
+    }, {
+      submission: {
+        action: async (form) => {
+          try {
+            const result = await this.#orderApi.save(form().value(), 'server-error');
+            this.submitted.emit(result);
+            form().reset();
+            return
+          } catch(error: unknown) {
+            if (error instanceof HttpErrorResponse) {
+              const apiError = error.error as ApiError | null;
+              return {
+                kind: 'server-error',
+                message: apiError?.message ?? `Server Error. Try again later.`,
+              };
+            }
+            return {
+              kind: 'unknown-error',
+              message: `Unknown error. Try again later.`,
+            };
+          }
+        },
+        onInvalid: (form) => {
+          form().errorSummary()[0].fieldTree().focusBoundControl();
+        },
+      }
+    }
+  );
+
+  protected readonly buttonText = computed(() => this.form().submitting() ? `Submitting...` : `Submit`);
+
+  constructor() {
+    inspectFormState(this.form);
+  }
+
+  protected addAttendee() {
+    this.form.attendees.list().value.update(
+      (list) => [...list, { email: '', level: 'junior' }]
+    );
+  }
+
+  protected removeAttendee(index: number) {
+    this.form.attendees.list().value.update(
+      (list) => list.filter((_, i) => i !== index)
+    );
+  }
+}
+
+export function findDuplicateEmails(attendees: Attendee[]): number[] {
+  const emails = attendees.map((a) => a.email.toLowerCase());
+  const duplicates: number[] = [];
+
+  emails.forEach((email, index) => {
+    if (email && emails.indexOf(email) !== index) {
+      duplicates.push(index);
+    }
+  });
+
+  return duplicates;
+}

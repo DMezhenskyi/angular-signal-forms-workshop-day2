@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing-step) * 2);
+  padding: calc(var(--spacing-step) * 2);
+  height: var(--header-height);
+  width: 100%;
+  border-radius: calc(var(--border-radius) * 2);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing-step) * 1.5);
+}

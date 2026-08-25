@@ -1,0 +1,103 @@
+:host {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  color: var(--color-text);
+  padding: calc(var(--spacing-step) * 2);
+  background-color: var(--color-primary);
+  border-radius: var(--border-radius);
+}
+
+.checkout-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-step);
+}
+
+button {
+  background: var(--color-accent);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: var(--spacing-step) calc(var(--spacing-step) * 3);
+  transition: opacity 0.25s;
+  opacity: 0.85;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  &:hover:not(:disabled) {
+    opacity: 1;
+  }
+}
+
+.actions {
+  margin-top: var(--spacing-step);
+  .submit-button {
+    width: 100%;
+  }
+}
+
+.error-banner {
+  color: var(--color-error);
+  background-color: color-mix(in srgb, var(--color-error) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-error) 45%, transparent);
+  border-radius: var(--border-radius);
+  padding: calc(var(--spacing-step) * 1.25) calc(var(--spacing-step) * 1.5);
+  font-size: 0.8rem;
+}
+
+.attendees {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: var(--spacing-step);
+  margin-bottom: calc(var(--spacing-step) * 2);
+
+  > button {
+    grid-area: 1 / 2;
+    width: var(--row-button-size);
+    padding: var(--spacing-step) 0;
+  }
+
+  &-container {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-step);
+  }
+
+  > .error-message {
+    grid-column: 1 / -1;
+  }
+}
+
+.attendee-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-step);
+  width: 100%;
+
+  .form-field {
+    min-height: auto;
+  }
+
+  > button.delete {
+    flex: 0 0 auto;
+    width: var(--row-button-size);
+    padding: var(--spacing-step) 0;
+    background: transparent;
+    border-color: var(--color-error);
+    color: var(--color-error);
+    &:hover {
+      background: opacity(0.5);
+    }
+  }
+}

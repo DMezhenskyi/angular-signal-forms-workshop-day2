@@ -1,0 +1,14 @@
+{
+  "features": {
+    "ghcr.io/defspace-io/devcontainer-features/command-history:latest": {
+      "version": "1.0.0",
+      "resolved": "ghcr.io/defspace-io/devcontainer-features/command-history@sha256:0d47d22b61764d3825f9412b60cbd2330c0aed7a92a3f9cdfbd935d2d7b439df",
+      "integrity": "sha256:0d47d22b61764d3825f9412b60cbd2330c0aed7a92a3f9cdfbd935d2d7b439df"
+    },
+    "ghcr.io/defspace-io/devcontainer-features/pnpm:latest": {
+      "version": "1.0.0",
+      "resolved": "ghcr.io/defspace-io/devcontainer-features/pnpm@sha256:a1375693aa38dec6746ce6a46e8ba09c10dcce217a0c79f65b2df46f9d0fa60a",
+      "integrity": "sha256:a1375693aa38dec6746ce6a46e8ba09c10dcce217a0c79f65b2df46f9d0fa60a"
+    }
+  }
+}

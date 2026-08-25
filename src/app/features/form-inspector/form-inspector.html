@@ -1,0 +1,67 @@
+@if (state(); as state) {
+  <div class="badges">
+    <span class="badge" [class.active]="state.valid()">valid</span>
+    <span class="badge" [class.active]="state.invalid()">invalid</span>
+    <span class="badge" [class.active]="state.touched()">touched</span>
+    <span class="badge" [class.active]="state.dirty()">dirty</span>
+    <span class="badge" [class.active]="state.pending()">pending</span>
+    <span class="badge" [class.active]="state.submitting()">submitting</span>
+  </div>
+
+  <table class="fields">
+    <thead>
+      <tr>
+        <th>Field</th>
+        <th>Touched</th>
+        <th>Dirty</th>
+        <th>Valid</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.path) {
+        <tr>
+          <td class="field-name" [style.padding-left.rem]="row.depth * 0.75">
+            @if (row.group) {
+              <button type="button" class="toggle" (click)="toggle(row)">
+                <span class="caret" [class.open]="row.expanded">▸</span>
+                {{ row.label }}
+              </button>
+            } @else {
+              <span class="leaf">{{ row.label }}</span>
+            }
+          </td>
+          <td [class.on]="row.field().touched()">
+            {{ row.field().touched() ? '•' : '·' }}
+          </td>
+          <td [class.on]="row.field().dirty()">
+            {{ row.field().dirty() ? '•' : '·' }}
+          </td>
+          <td [class.on]="row.field().valid()">
+            {{ row.field().valid() ? '✓' : '✗' }}
+          </td>
+        </tr>
+        @for (error of row.field().errors(); track error.kind) {
+          <tr class="field-error">
+            <td colspan="4" [style.padding-left.rem]="row.depth * 0.75 + 1">
+              ↳ {{ error.message ?? error.kind }}
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+
+  @if (state.errors().length) {
+    <div class="section-title">Form errors</div>
+    <ul class="form-errors">
+      @for (error of state.errors(); track error.kind) {
+        <li>{{ error.message ?? error.kind }}</li>
+      }
+    </ul>
+  }
+
+  <div class="section-title">Value</div>
+  <pre class="value">{{ json() }}</pre>
+} @else {
+  <p class="no-data">Connect a form to inspect its state.</p>
+}

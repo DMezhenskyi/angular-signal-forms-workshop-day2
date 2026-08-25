@@ -1,0 +1,44 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+// Brand tokens
+:root {
+  --color-primary: #121314;
+  --color-surface: #191a1b;
+  --color-accent: #ffdf5a;
+  --color-text: #f9f7da;
+  --color-success: #4caf50;
+  --color-error: #ff5722;
+  --color-info: #449eff;
+  --color-warn: #ffb020;
+  --color-border: rgba(255, 255, 255, 0.15);
+  --color-control-background: rgba(255, 255, 255, 0.06);
+  --color-muted-text: rgba(255, 255, 255, 0.55);
+  --border-radius: 5px;
+  --spacing-step: 8px;
+  // square +/- buttons sitting inside a form row
+  --row-button-size: calc(var(--spacing-step) * 4);
+  --header-height: 64px;
+  --sidebar-width: 355px;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+.no-data {
+  padding: calc(var(--spacing-step) * 1.15) var(--spacing-step);
+  border: dashed 1px var(--color-border);
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  text-align: center;
+  width: 100%;
+  color: var(--color-muted-text);
+}
