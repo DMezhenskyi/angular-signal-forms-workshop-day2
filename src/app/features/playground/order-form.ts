@@ -2,11 +2,14 @@ import { Component, computed, inject, input, linkedSignal, output, resource, Sig
 import { disabled, email, form, FormField, max, min, required, provideSignalFormsConfig, applyEach, maxLength, hidden, pattern, validate, validateTree, validateHttp, validateAsync, debounce, FormRoot } from '@angular/forms/signals';
 import { inspectFormState } from '@features/form-inspector/form-connector';
 
-import { Attendee, EmailCheckResult, INITIAL_ORDER_VALUES, Order, TAX_ID_RULES, VatCheckResult } from './order';
+import { INITIAL_ORDER_VALUES, Order } from './order';
 import { OrderApi } from './order-api';
 import { EMAIL_SIMULATION_MODE, VAT_SIMULATION_MODE } from '@core/http/simulation-mode';
 import { ApiError } from '@core/http/model';
 import { HttpContext, HttpErrorResponse } from '@angular/common/http';
+import { Attendee } from './attendee/attendee';
+import { TAX_ID_RULES, VatCheckResult } from './company/company';
+import { EmailCheckResult } from './customer/customer';
 
 @Component({
   selector: 'df-order-form',
