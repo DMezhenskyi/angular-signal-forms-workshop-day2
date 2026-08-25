@@ -1,5 +1,25 @@
 <form class="checkout-form" [formRoot]="form">
   <df-customer-form [form]="form.customer" />
+  <!--
+    TODO: Task 2: Move the attendee block into <df-attendee-configurator-form> (~12 min)
+
+    Your job:
+      - Move the Attendee Count field and the whole <section class="attendees">
+        into the template of AttendeeConfiguratorForm. Move the row markup as it is,
+        Task 2 splits it.
+      - Move addAttendee() and removeAttendee() into that component too.
+      - In the child, read the fields from its `form` input instead of
+        `form.attendees`.
+      - Render <df-attendee-configurator-form [form]="form.attendees" /> here, and add
+        the component to the `imports` of OrderForm.
+
+    NOTE: do not change the schema in order-form.ts.
+
+    References:
+      - https://angular.dev/api/forms/signals/FieldTree
+      - https://angular.dev/guide/forms/signals/field-state-management#accessing-field-state
+      - https://angular.dev/guide/components/inputs#required-inputs
+  -->
   <div class="form-field">
     <label for="attendee-count">Attendee Count</label>
     <input [formField]="form.attendees.count" id="attendee-count" type="number" class="form-control" />
@@ -45,6 +65,23 @@
     <input [formField]="form.businessPurchase" id="business-purchase" type="checkbox" class="form-control" />
   </div>
   @if (!form.company().hidden()) {
+    <!--
+      TODO: Task 1: Move the company block into <df-company-form> (~8 min)
+
+      Your job:
+        - Move the whole <fieldset> into the template of CompanyForm
+          (company/company-form.ts) and read the fields from its `form` input.
+        - Render <df-company-form [form]="form.company" /> here, inside this @if.
+        - Keep the @if (!form.company().hidden()) in this file. The parent decides
+          what to render, the child only draws the fields.
+
+      NOTE: do not change the schema in order-form.ts. Splitting the view does not split the form. The child gets a branch of the same FieldTree.
+
+      References:
+        - https://angular.dev/guide/forms/signals/field-state-management#hidden-fields
+        - https://angular.dev/guide/forms/signals/field-state-management#conditional-error-display
+        - https://angular.dev/guide/forms/signals/form-logic#disabled-reasons
+    -->
     <fieldset>
       <legend>Company Information</legend>
       <div class="form-field">
@@ -96,3 +133,8 @@
     <button class="submit-button" [disabled]="form().submitting()" type="submit">{{ buttonText() }}</button>
   </section>
 </form>
+<!--
+    TODO TASK 4* 
+    You should do nothing here, but think how we could force API consistency
+    and predictability for our sub-forms    
+-->
