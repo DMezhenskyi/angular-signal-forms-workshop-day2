@@ -1,25 +1,43 @@
-import { schema } from "@angular/forms/signals";
+import { schema, required, min, max, applyEach, maxLength, validateTree } from '@angular/forms/signals';
+import { Attendees } from '../attendee';
+import { findDuplicateEmails } from '../attendee-utils';
+import { attendeeFormSchema } from '../attendee/attendee-form-schema';
 
-export const attendeeConfiguratorFormSchema = schema((p) => {
-  /*
-    TODO: Task 3: Move the attendee rules into this schema (~10 min)
+export const attendeeConfiguratorFormSchema = schema<Attendees>((p) => {
+  required(p.count, { message: `This field is required` });
+  min(p.count, 1, { message: (ctx) => `Minimum ${ctx.state.min?.()} attendee` });
+  max(p.count, 10, {
+    message: ({ value, state }) => `${value()} attendees? We only have ${state.max?.()} seats`,
+  });
+  applyEach(p.list, attendeeFormSchema);
+  maxLength(p.list,
+    ({ valueOf }) => valueOf(p.count) ?? undefined,
+    {
+      message: ({ state }) => `You can only add ${state.maxLength?.()} attendees`,
+    }
+  );
+  validateTree(p.list, (ctx) => {
+    const duplicatedEmailIndexes = findDuplicateEmails(ctx.value());
 
-    Problem: the attendee rules are the biggest block left in the root schema:
-    count limits, per-attendee rules, list length and the duplicate check.
+    // No duplicates found, exit validation with success
+    if (duplicatedEmailIndexes.length === 0) {
+      return;
+    }
 
-    Your job:
-      - Type this schema for the Attendees model.
-      - Move every `path.attendees.*` rule from order-form.ts here.
-      - Move `findDuplicateEmails()` from order-form.ts to ../attendee-utils.ts
-        and import it here.
-      - Apply this schema to `path.attendees` in order-form.ts.
+    const duplicatedEmailErrors = duplicatedEmailIndexes
+      .map((index) => ({
+        kind: 'duplicated-attendee',
+        message: `This attendee is already added`,
+        fieldTree: ctx.fieldTree[index]?.email,
+      }));
 
-    NOTE: `maxLength()` reads `count`. `count` and `list` are both attendee
-    fields, so this rule is self-contained here.
-
-    References:
-      - https://angular.dev/guide/forms/signals/schemas#using-the-schema-with-apply
-      - https://angular.dev/guide/forms/signals/cross-field-logic#using-validatetree
-      - https://angular.dev/guide/forms/signals/validation#minlength-and-maxlength
-  */
+    return [
+      ...duplicatedEmailErrors,
+      {
+        kind: 'duplicates-in-list',
+        message: `The list contains duplicated emails`,
+        fieldTree: ctx.fieldTree,
+      }
+    ];
+  });
 });

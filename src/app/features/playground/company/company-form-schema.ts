@@ -1,25 +1,73 @@
-import { schema } from "@angular/forms/signals";
+import { debounce, disabled, hidden, pattern, required, schema, validate, validateHttp } from '@angular/forms/signals';
+import { Company, TAX_ID_RULES, VatCheckResult } from './company';
+import { HttpContext } from '@angular/common/http';
+import { VAT_SIMULATION_MODE } from '@core/http/simulation-mode';
 
-export const companyFormSchema = schema((p) => {
-  /*
-    TODO: Task 2: Move the company rules into this schema (~10 min)
+export const companyFormSchema = schema<Company>((p) => {
+  pattern(p.taxId, ({ valueOf }) => {
+    const country = valueOf(p.country);
+    const TAX_ID_KEY = ['AT', 'DE', 'CH'].includes(country) ? 'EU_VAT' : country;
+    return TAX_ID_RULES[TAX_ID_KEY]?.pattern;
+  }, {
+    message: `Doesn't match the format`,
+  });
+  validate(p.taxId, (ctx) => {
+    const countryPrefix = ctx.valueOf(p.country);
 
-    Problem: the company rules are ~60 lines in the root schema, but almost all
-    of them read only company fields.
+    // Not an EU/VAT country, no need to validate
+    if (!['AT', 'DE', 'CH'].includes(countryPrefix)) {
+      return;
+    }
+    // Empty value is the job of required(), not of this validator
+    if (!ctx.value()) {
+      return;
+    }
+    // VAT starts with a proper country ISO code -> exit validation with success
+    if (ctx.value().toUpperCase().startsWith(countryPrefix)) {
+      return;
+    }
 
-    Your job:
-      - Type this schema for the Company model.
-      - Move every self-contained company rule from order-form.ts here and
-        shorten the paths: `path.company.taxId` -> `p.taxId`.
-      - Apply this schema to `path.company` in order-form.ts.
-
-    NOTE: `required(path.company.name)` read
-    `businessPurchase`, which is not owned by this schema. Leave it for now in the root
-    schema. The next lab comes back to them.
-
-    References:
-      - https://angular.dev/guide/forms/signals/schemas#create-reusable-schemas-with-schema
-      - https://angular.dev/guide/forms/signals/schemas#using-the-schema-with-apply
-      - https://angular.dev/guide/forms/signals/cross-field-logic#understanding-the-field-context
-  */
+    return {
+      kind: 'vat-starts-with',
+      message: `VAT should start with country ISO code ${countryPrefix}`,
+    }
+  });
+  disabled(p.taxId, {
+    when: ({ valueOf }) => {
+      const country = valueOf(p.country);
+      return country === 'OTHER' ? `B2B purchase isn't available for other countries` : false;
+    }
+  });
+  hidden(p.taxId, {
+    when: ({ valueOf }) => valueOf(p.country) === '',
+  });
 });
+
+export const companyBusinessPurchaseSchema = schema<Company>((p) => {
+  required(p.name, { message: `This field is required` });
+  debounce(p.taxId, 'blur');
+  validateHttp<string, VatCheckResult>(p.taxId, {
+    request: (ctx) => {
+      return ({
+        url: `/company/tax/verify?country=${ctx.valueOf(p.country)}&taxId=${ctx.value()}`,
+        context: new HttpContext().set(VAT_SIMULATION_MODE, 'valid')
+      })
+    },
+    onSuccess: (result) => {
+      if (!result.valid) {
+        return ({
+          kind: 'tax-registry-not-found',
+          message: result.reason ?? `No such Tax ID in the registry`,
+        });
+      }
+      return;
+    },
+    onError: () => {
+      return ({
+        kind: 'tax-registry-network-error',
+        message: `Network error while checking the Tax ID registry`,
+      })
+    },
+    when: (ctx) => !!ctx.value() && ['AT', 'DE', 'CH'].includes(ctx.valueOf(p.country))
+  });
+})
