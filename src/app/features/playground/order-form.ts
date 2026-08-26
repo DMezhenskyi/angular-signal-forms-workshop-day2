@@ -41,6 +41,18 @@ export class OrderForm {
   protected readonly form = form(
     this.#model, (path) => {
       apply(path.customer, customerFormSchema);
+      /*
+        TODO: Task 1: Decide which rules can move (~3 min)
+
+        Your job:
+          - Read the rules below. For each one, ask: does it read only fields of
+            its own group (customer, attendees, company)? If yes, then it is a
+            candidate to be moved.
+
+        References:
+          - https://angular.dev/guide/forms/signals/schemas
+          - https://angular.dev/guide/forms/signals/cross-field-logic#understanding-the-field-context
+      */
       required(path.attendees.count, { message: `This field is required` });
       min(path.attendees.count, 1, { message: (ctx) => `Minimum ${ctx.state.min?.()} attendee` });
       max(path.attendees.count, 10, {
@@ -83,6 +95,25 @@ export class OrderForm {
       hidden(path.company, {
         when: ({ valueOf }) => !valueOf(path.businessPurchase),
       });
+      /*
+        TODO: Task 5: conditional schemas (~5 min)
+
+        The required company name rule below we left here because it reads
+        `businessPurchase`. It clearly highlights that our company form can exist in multiple contexts:
+          - regular context (settings page, registration form, etc)
+          - business purchase context (checkout form, etc)
+        Schemas are representation of those contexts and hold the corresponding rules and behaviour.
+      
+        Your job:
+          - Create a new schema `companyBusinessPurchaseSchema` in company-form-schema.ts
+          - Move the required company name rule into it
+          - Apply the new schema to `path.company` only when `businessPurchase` is true
+
+        TIP: applyWhen() or applyWhenValue() rules will help you with that.
+
+        References:
+          - https://angular.dev/guide/forms/signals/schemas#combining-applywhen-with-reusable-schemas
+      */
       required(path.company.name,
         {
           when: ({ valueOf }) => valueOf(path.businessPurchase),
