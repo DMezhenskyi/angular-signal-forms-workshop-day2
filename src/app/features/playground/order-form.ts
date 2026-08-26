@@ -2,7 +2,10 @@ import { Component, computed, inject, input, linkedSignal, output } from '@angul
 import { form, FormField, provideSignalFormsConfig, hidden, FormRoot, apply, applyWhen } from '@angular/forms/signals';
 import { inspectFormState } from '@features/form-inspector/form-connector';
 
-import { INITIAL_ORDER_VALUES, Order } from './order';
+import { Toggle } from '@shared/toggle/toggle';
+import { OptionPicker } from '@shared/option-picker/option-picker';
+import { BASE_LOCATIONS, BUSINESS_LOCATIONS, INITIAL_ORDER_VALUES, Order } from './order';
+
 import { OrderApi } from './order-api';
 import { ApiError } from '@core/http/model';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -17,7 +20,7 @@ import { companyBusinessPurchaseSchema, companyFormSchema } from './company/comp
   selector: 'df-order-form',
   styleUrls: ['./order-form.scss', './form-core.scss'],
   templateUrl: './order-form.html',
-  imports: [FormField, FormRoot, CustomerForm, CompanyForm, AttendeeConfiguratorForm],
+  imports: [FormField, FormRoot, CustomerForm, CompanyForm, AttendeeConfiguratorForm, Toggle, OptionPicker],
   providers: [
     provideSignalFormsConfig({
       classes: {
@@ -79,6 +82,11 @@ export class OrderForm {
 
   protected readonly buttonText = computed(() => this.form().submitting() ? `Submitting...` : `Submit`);
 
+  protected readonly locations = computed(() =>
+    this.form.businessPurchase().value()
+      ? [...BASE_LOCATIONS, ...BUSINESS_LOCATIONS]
+      : BASE_LOCATIONS,
+  );
   constructor() {
     inspectFormState(this.form);
   }

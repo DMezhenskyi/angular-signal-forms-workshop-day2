@@ -52,3 +52,6 @@ button {
   padding: calc(var(--spacing-step) * 1.25) calc(var(--spacing-step) * 1.5);
   font-size: 0.8rem;
 }
+.location-picker {
+  margin-bottom: calc(var(--spacing-step) * 2);
+}
