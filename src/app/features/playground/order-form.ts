@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, linkedSignal, output } from '@angular/core';
-import { disabled, email, form, FormField, max, min, required, provideSignalFormsConfig, applyEach, maxLength, hidden, pattern, validate, validateTree, validateHttp, validateAsync, debounce, FormRoot } from '@angular/forms/signals';
+import { disabled, email, form, FormField, max, min, required, provideSignalFormsConfig, applyEach, maxLength, hidden, pattern, validate, validateTree, validateHttp, validateAsync, debounce, FormRoot, apply } from '@angular/forms/signals';
 import { inspectFormState } from '@features/form-inspector/form-connector';
 
 import { INITIAL_ORDER_VALUES, Order } from './order';
@@ -13,6 +13,7 @@ import { EmailCheckResult } from './customer/customer';
 import { CustomerForm } from './customer/customer-form';
 import { CompanyForm } from './company/company-form';
 import { AttendeeConfiguratorForm } from './attendee/attendee-configurator/attendee-configurator-form';
+import { customerFormSchema } from './customer/customer-form-schema';
 
 @Component({
   selector: 'df-order-form',
@@ -39,32 +40,7 @@ export class OrderForm {
 
   protected readonly form = form(
     this.#model, (path) => {
-      required(path.customer.firstName, { message: `This field is required`});
-      required(path.customer.lastName, { message: `This field is required`});
-      required(path.customer.email, { message: `This field is required`});
-      email(path.customer.email, { message: `Please enter a valid email address` });
-      validateHttp<string, EmailCheckResult>(path.customer.email, {
-        request: (ctx) => ({
-          url: `/user/email/check?email=${ctx.value()}`,
-          context: new HttpContext().set(EMAIL_SIMULATION_MODE, 'allowed')
-        }),
-        onSuccess: (result, ctx) => {
-          if (!result.allowed) {
-            return ({
-              kind: 'email-taken',
-              message: result.reason ?? `This email is already taken`,
-            });
-          }
-          return;
-        },
-        onError: () => {
-          return ({
-            kind: 'email-taken-network-error',
-            message: `Network error while checking email availability`,
-          })
-          
-        }
-      }),
+      apply(path.customer, customerFormSchema);
       required(path.attendees.count, { message: `This field is required` });
       min(path.attendees.count, 1, { message: (ctx) => `Minimum ${ctx.state.min?.()} attendee` });
       max(path.attendees.count, 10, {
