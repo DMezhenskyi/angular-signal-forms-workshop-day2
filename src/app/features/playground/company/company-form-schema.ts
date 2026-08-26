@@ -2,6 +2,7 @@ import { debounce, disabled, hidden, pattern, required, schema, validate, valida
 import { Company, TAX_ID_RULES, VatCheckResult } from './company';
 import { HttpContext } from '@angular/common/http';
 import { VAT_SIMULATION_MODE } from '@core/http/simulation-mode';
+import { startWithValidator } from '../start-with-validator';
 
 export const companyFormSchema = schema<Company>((p) => {
   pattern(p.taxId, ({ valueOf }) => {
@@ -11,6 +12,8 @@ export const companyFormSchema = schema<Company>((p) => {
   }, {
     message: `Doesn't match the format`,
   });
+  startWithValidator(p.taxId, 'AT');
+  
   validate(p.taxId, (ctx) => {
     const countryPrefix = ctx.valueOf(p.country);
 
