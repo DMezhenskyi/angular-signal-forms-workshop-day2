@@ -41,6 +41,18 @@ export class OrderForm {
   protected readonly form = form(
     this.#model, (path) => {
       apply(path.customer, customerFormSchema);
+      /*
+        TODO: Task 1: Decide which rules can move (~3 min)
+
+        Your job:
+          - Read the rules below. For each one, ask: does it read only fields of
+            its own group (customer, attendees, company)? If yes, then it is a
+            candidate to be moved.
+
+        References:
+          - https://angular.dev/guide/forms/signals/schemas
+          - https://angular.dev/guide/forms/signals/cross-field-logic#understanding-the-field-context
+      */
       required(path.attendees.count, { message: `This field is required` });
       min(path.attendees.count, 1, { message: (ctx) => `Minimum ${ctx.state.min?.()} attendee` });
       max(path.attendees.count, 10, {
@@ -83,6 +95,19 @@ export class OrderForm {
       hidden(path.company, {
         when: ({ valueOf }) => !valueOf(path.businessPurchase),
       });
+      /*
+        TODO: Task 5*: Rules that cross a group border (stretch)
+
+        Write no code. Think and be ready to discuss:
+
+        The company name rule below stays here because it reads
+        `businessPurchase`, a field the company does not own. The `hidden()` rule
+        above has the same problem. What solutions come to mind?
+
+        References:
+          - https://angular.dev/guide/forms/signals/schemas
+          - https://angular.dev/guide/forms/signals/cross-field-logic#understanding-the-field-context
+      */
       required(path.company.name,
         {
           when: ({ valueOf }) => valueOf(path.businessPurchase),
