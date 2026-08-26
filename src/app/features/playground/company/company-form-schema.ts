@@ -1,26 +1,33 @@
-import { debounce, disabled, hidden, pattern, required, schema, validateHttp } from '@angular/forms/signals';
+import { debounce, disabled, hidden, metadata, pattern, required, schema, validateHttp, createMetadataKey } from '@angular/forms/signals';
 import { Company, TAX_ID_RULES, VatCheckResult } from './company';
 import { HttpContext } from '@angular/common/http';
 import { VAT_SIMULATION_MODE } from '@core/http/simulation-mode';
 import { startWithValidator } from '../start-with-validator';
 
+export const IS_EU_VAT_COUNTRY = createMetadataKey<boolean>();
+
 export const companyFormSchema = schema<Company>((p) => {
-  pattern(p.taxId, ({ valueOf }) => {
+
+  const EU_VAT_COUNTRIES = metadata(p.taxId, createMetadataKey<string[]>(), () => ['AT', 'DE', 'CH']);
+  
+  metadata(p.taxId, IS_EU_VAT_COUNTRY, ({state, valueOf}) => 
+      state.metadata(EU_VAT_COUNTRIES)?.()?.includes(valueOf(p.country)) ?? false
+  );
+
+  pattern(p.taxId, ({ valueOf, state }) => {
     const country = valueOf(p.country);
-    const TAX_ID_KEY = ['AT', 'DE', 'CH'].includes(country) ? 'EU_VAT' : country;
+    const TAX_ID_KEY = state.metadata(IS_EU_VAT_COUNTRY)?.() ? 'EU_VAT' : country;    
     return TAX_ID_RULES[TAX_ID_KEY]?.pattern;
   }, {
     message: `Doesn't match the format`,
   });
 
   startWithValidator(p.taxId, ({ valueOf }) => valueOf(p.country), {
-
-    when: ({ valueOf }) => ['AT', 'DE', 'CH'].includes(valueOf(p.country)),
+    when: ({ state }) =>  state.metadata(IS_EU_VAT_COUNTRY)?.() ?? false,
     error: ({ valueOf }) => ({
       kind: 'vat-starts-with',
       message: `VAT should start with country ISO code ${valueOf(p.country)}`,
     }),
-    
   });
 
   disabled(p.taxId, {
@@ -59,6 +66,6 @@ export const companyBusinessPurchaseSchema = schema<Company>((p) => {
         message: `Network error while checking the Tax ID registry`,
       })
     },
-    when: (ctx) => !!ctx.value() && ['AT', 'DE', 'CH'].includes(ctx.valueOf(p.country))
+    when: (ctx) => !!ctx.value() && !!ctx.state.metadata(IS_EU_VAT_COUNTRY)?.(),
   });
 })
