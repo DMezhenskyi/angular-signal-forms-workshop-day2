@@ -14,6 +14,36 @@ export const companyFormSchema = schema<Company>((p) => {
       state.metadata(EU_VAT_COUNTRIES)?.()?.includes(valueOf(p.country)) ?? false
   );
 
+  /*
+    TODO: Task 1: Let the schema name the Tax ID field (~15 min)
+
+    Problem: pick Canada and the label still says "Tax / VAT ID", the placeholder
+    still says "E.g. DE123456789". TAX_ID_RULES has carried a `label` and a
+    `placeholder` per tax regime since lab 1 and nothing reads them - because the
+    regime is resolved inside pattern() below, where only pattern() can see it.
+
+    Your job:
+      - Create a `TAX_ID_RULE` metadata key. It holds one entry of TAX_ID_RULES. Think if it
+        should be a local or globaly exposed metadata key.
+      - register a `metadata()` rule here that resolves that entry for the current
+        country. Use other metadata keys we created earlier if needed.
+      - Rewrite pattern() below to read the pattern rule instead of resolving it again.
+      - In company-form.ts bind the label text and the placeholder of the Tax ID
+        input to the rule. 
+
+    TIP (read only if stuck): inside a rule the field state comes from the
+    context - `state.metadata(KEY)?.()`. In a template it comes from the field -
+    `form().taxId().metadata(KEY)?.()`. A template only sees what the class
+    exposes, so the key needs a `protected readonly` field on CompanyForm.
+
+    Check: United States -> "EIN" / "12-3456789". Canada -> "Business Number" /
+    "123456789RT0001". Austria -> "VAT / UID" / "ATU12345678". `12345` still
+    shows "Doesn't match the format".
+
+    References:
+      - https://angular.dev/guide/forms/signals/field-metadata#creating-a-metadata-key
+      - https://angular.dev/guide/forms/signals/field-metadata#setting-values-from-a-schema
+  */
   pattern(p.taxId, ({ valueOf, state }) => {
     const country = valueOf(p.country);
     const TAX_ID_KEY = state.metadata(IS_EU_VAT_COUNTRY)?.() ? 'EU_VAT' : country;    
