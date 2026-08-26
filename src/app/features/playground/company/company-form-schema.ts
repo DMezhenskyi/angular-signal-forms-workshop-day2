@@ -1,4 +1,4 @@
-import { debounce, disabled, hidden, pattern, required, schema, validate, validateHttp } from '@angular/forms/signals';
+import { debounce, disabled, hidden, pattern, required, schema, validateHttp } from '@angular/forms/signals';
 import { Company, TAX_ID_RULES, VatCheckResult } from './company';
 import { HttpContext } from '@angular/common/http';
 import { VAT_SIMULATION_MODE } from '@core/http/simulation-mode';
@@ -13,50 +13,16 @@ export const companyFormSchema = schema<Company>((p) => {
     message: `Doesn't match the format`,
   });
 
-  /*
-    TODO: Task 1: Extract the prefix check into a reusable validator (~6 min)
+  startWithValidator(p.taxId, ({ valueOf }) => valueOf(p.country), {
 
-    Problem: the `validate()` block below is generic logic, locked in this schema.
-
-    Your job:
-      - Fill the empty `validate()` in ../start-with-validator.ts: report an
-        error when the value does not start with `startWith`. Ignore case.
-        Skip empty values, they are the job of `required()`.
-      - Call it here with a fixed prefix: replace 'TODO' with 'AT'.
-      - Keep the old `validate()` block. You delete it in Task 3.
-
-    Check: Business Purchase on, Germany, `DE123456`, click outside -> you see
-    your new error. The old check stays quiet.
-
-    Next: Task 2 in ../start-with-validator.ts
-
-    References:
-      - https://angular.dev/guide/forms/signals/validation#reusable-validation-rules
-      - https://angular.dev/guide/forms/signals/validation#using-validate
-  */
-  startWithValidator(p.taxId, 'TODO');
-  
-  validate(p.taxId, (ctx) => {
-    const countryPrefix = ctx.valueOf(p.country);
-
-    // Not an EU/VAT country, no need to validate
-    if (!['AT', 'DE', 'CH'].includes(countryPrefix)) {
-      return;
-    }
-    // Empty value is the job of required(), not of this validator
-    if (!ctx.value()) {
-      return;
-    }
-    // VAT starts with a proper country ISO code -> exit validation with success
-    if (ctx.value().toUpperCase().startsWith(countryPrefix)) {
-      return;
-    }
-
-    return {
+    when: ({ valueOf }) => ['AT', 'DE', 'CH'].includes(valueOf(p.country)),
+    error: ({ valueOf }) => ({
       kind: 'vat-starts-with',
-      message: `VAT should start with country ISO code ${countryPrefix}`,
-    }
+      message: `VAT should start with country ISO code ${valueOf(p.country)}`,
+    }),
+    
   });
+
   disabled(p.taxId, {
     when: ({ valueOf }) => {
       const country = valueOf(p.country);
