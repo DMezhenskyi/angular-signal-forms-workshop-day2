@@ -1,4 +1,4 @@
-import { Component, input, linkedSignal, output } from '@angular/core';
+import { Component, input, model, output } from '@angular/core';
 import { FormCheckboxControl } from '@angular/forms/signals';
 
 @Component({
@@ -6,21 +6,25 @@ import { FormCheckboxControl } from '@angular/forms/signals';
   styleUrls: ['./toggle.scss'],
   host: {
     '(click)': 'toggle()',
+    '(blur)': 'touch.emit()',
+    '[attr.tabindex]': '0',
+    '[class.disabled]': 'disabled()',
   },
   template: `
-    <span class="track" [class.on]="rawEnabled()">
+    <span class="track" [class.on]="checked()">
       <span class="knob"></span>
     </span>
   `,
 })
-export class Toggle {
-  readonly enabled = input<boolean>(false);
-  readonly enabledChange = output<boolean>();
-
-  protected readonly rawEnabled = linkedSignal(() => this.enabled());
+export class Toggle implements FormCheckboxControl {
+  readonly checked = model<boolean>(false);
+  readonly disabled = input(false);
+  readonly touch = output<void>();
 
   protected toggle(): void {
-    this.rawEnabled.update((enabled) => !enabled);
-    this.enabledChange.emit(this.rawEnabled());
+    if (this.disabled()) {
+      return;
+    }
+    this.checked.update((checked) => !checked);
   }
 }

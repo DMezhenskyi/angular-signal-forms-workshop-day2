@@ -72,6 +72,10 @@
       appearance: none;
     }
   }
+  .disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 
   input[type='checkbox'] {
     width: 16px;
