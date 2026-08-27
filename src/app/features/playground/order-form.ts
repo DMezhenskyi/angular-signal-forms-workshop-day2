@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, linkedSignal, output } from '@angular/core';
-import { form, FormField, provideSignalFormsConfig, hidden, FormRoot, apply, applyWhen } from '@angular/forms/signals';
+import { form, FormField, provideSignalFormsConfig, hidden, FormRoot, apply, applyWhen, readonly, disabled } from '@angular/forms/signals';
 import { inspectFormState } from '@features/form-inspector/form-connector';
 
 import { Toggle } from '@shared/toggle/toggle';
@@ -51,6 +51,9 @@ export class OrderForm {
         ({ valueOf }) => valueOf(path.businessPurchase),
         companyBusinessPurchaseSchema
       );
+      // readonly(path.location, {
+      //   when: ({valueOf}) => Number(valueOf(path.attendees.count)) < 5
+      // });
     }, {
       submission: {
         action: async (form) => {
