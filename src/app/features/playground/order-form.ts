@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, linkedSignal, output } from '@angular/core';
+import { Component, computed, effect, inject, input, linkedSignal, output, signal, untracked } from '@angular/core';
 import { form, FormField, provideSignalFormsConfig, hidden, FormRoot, apply, applyWhen, readonly, disabled } from '@angular/forms/signals';
 import { inspectFormState } from '@features/form-inspector/form-connector';
 
@@ -15,6 +15,7 @@ import { AttendeeConfiguratorForm } from './attendee/attendee-configurator/atten
 import { customerFormSchema } from './customer/customer-form-schema';
 import { attendeeConfiguratorFormSchema } from './attendee/attendee-configurator/attendee-configurator-form-schema';
 import { companyBusinessPurchaseSchema, companyFormSchema } from './company/company-form-schema';
+
 
 @Component({
   selector: 'df-order-form',
@@ -51,9 +52,9 @@ export class OrderForm {
         ({ valueOf }) => valueOf(path.businessPurchase),
         companyBusinessPurchaseSchema
       );
-      // readonly(path.location, {
-      //   when: ({valueOf}) => Number(valueOf(path.attendees.count)) < 5
-      // });
+      readonly(path.location, {
+        when: ({valueOf}) => Number(valueOf(path.attendees.count)) < 5
+      });
     }, {
       submission: {
         action: async (form) => {
@@ -92,5 +93,16 @@ export class OrderForm {
   );
   constructor() {
     inspectFormState(this.form);
+
+    effect(() => {
+      const locations = this.locations();
+
+      untracked(() => {
+        const current = this.form.location().value();
+        if (!locations.some((l) => l.value === current)) {
+          this.form.location().value.set(locations[0].value);
+        }
+      });
+    })
   }
 }

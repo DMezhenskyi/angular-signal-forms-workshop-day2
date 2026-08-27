@@ -3,7 +3,7 @@
 
   <df-attendee-configurator-form [form]="form.attendees" />
 
-  <df-option-picker [selectedOption]="form.location().value()" class="location-picker" [options]="locations()"/>
+  <df-option-picker [formField]="form.location" class="location-picker" [options]="locations()"/>
 
   <div class="form-field business-toggle inline auto-height reversed">
     <label for="business-purchase">Business Purchase</label>
