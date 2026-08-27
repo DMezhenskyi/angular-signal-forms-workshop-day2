@@ -7,6 +7,7 @@ export interface Order {
   customer: Customer;
   attendees: Attendees;
   businessPurchase: boolean;
+  location: WorkshopLocation;
   company: Company;
 }
 
@@ -26,6 +27,7 @@ export const INITIAL_ORDER_VALUES: Order = {
     country: '',
     taxId: '',
   },
+  location: 'online',
 };
 
 export const BASE_LOCATIONS: PickerOption<WorkshopLocation>[] = [
