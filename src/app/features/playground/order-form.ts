@@ -25,7 +25,7 @@ import { companyBusinessPurchaseSchema, companyFormSchema } from './company/comp
   providers: [
     provideSignalFormsConfig({
       classes: {
-        'invalid': ({ state }) => state().touched() && state().invalid(), 
+        'invalid': ({ state }) => state().touched() && state().invalid(),
       },
     }),
   ],

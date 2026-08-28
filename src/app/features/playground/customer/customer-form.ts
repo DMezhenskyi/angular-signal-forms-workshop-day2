@@ -9,6 +9,33 @@ import { FieldErrorTracker } from '@shared/error-handling/error-tracker';
     <div class="form-field">
       <label for="first-name">First Name</label>
       <input dfFieldErrorTracker [formField]="form().firstName" id="first-name" type="text" class="form-control" placeholder="E.g. Albert" />
+      <!--
+        TODO Task 3: Attach everywhere, delete the copies (~8 min)
+
+        Problem: adding dfFieldErrorTracker to every input by hand is the same
+        repetition with a new name.
+
+        Goal: make the directive attach to every [formField] host automatically.
+        Then delete the manual error blocks: firstName, lastName, email (this
+        file), name + taxId (company-form.ts), email (attendee-form.ts) and
+        count (attendee-configurator-form.ts). Keep the pending() and
+        disabledReasons() spans. Keep the list-level error block in
+        attendee-configurator-form.ts. Remove the attribute from Task 1 and
+        this comment.
+
+        TIP (read only if stuck): a directive selector can list several
+        selectors, separated by a comma.
+
+        Check: every field still shows its errors, and no "error-message" span
+        is left in the four components. Errors now show before you touch a
+        field — this new problem is Task 4.
+
+        Next: order-form.ts, Task 4.
+
+        References:
+          - https://angular.dev/api/core/Directive
+          - https://angular.dev/guide/forms/signals/custom-controls#how-the-formfield-directive-works
+      -->
     </div>
     <div class="form-field">
       <label for="last-name">Last Name</label>
