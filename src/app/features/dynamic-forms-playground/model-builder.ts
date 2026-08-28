@@ -6,7 +6,6 @@ export interface DynamicModel {
 
 export function buildModel(configs: FieldConfig[]): DynamicModel {
   const model: DynamicModel = {};
-  // build the model based on the provided field configurations
   for (const config of configs) {
     model[config.name] = config?.default ?? '';
   }

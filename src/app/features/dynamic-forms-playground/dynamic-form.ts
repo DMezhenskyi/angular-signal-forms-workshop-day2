@@ -20,6 +20,43 @@ import { inspectFormState } from "@features/form-inspector/form-connector";
             <input [formField]="textField(config.name)" [id]="config.name" [placeholder]="config.placeholder" [type]="config.type" class="form-control" />
           </div>
         }
+        <!--
+          Task 2 scaffold: uncomment it and fill in the placeholders.
+
+          @case ('number') {
+            <div class="form-field">
+              <label [for]="config.name">{{ config.label }}</label>
+              <input [formField]="__RESOLVE__THE__CONTROL__" [id]="config.name" type="number" class="form-control" />
+            </div>
+          }
+        -->
+        <!--
+          Task 3 scaffold: uncomment it and fill in the placeholders.
+
+          @case ('checkbox') {
+            <div class="form-field inline auto-height reversed">
+              <label [for]="config.name">{{ config.label }}</label>
+              <input [formField]="__RESOLVE__THE__CONTROL__" [id]="config.name" type="checkbox" />
+            </div>
+          }
+        -->
+        <!--
+          Task 5 scaffold: uncomment it and fill in the placeholders.
+          It renders text children only. Every child needs the field of the
+          child inside the group, not on the root of the form.
+
+          @case ('group') {
+            <fieldset>
+              <legend>{{ config.label }}</legend>
+              @for (child of __GROUP__; track child.name) {
+                <div class="form-field">
+                  <label [for]="child.name">{{ child.label }}</label>
+                  <input [formField]="__RESOLVE_FIELD__" [id]="child.name" class="form-control" />
+                </div>
+              }
+            </fieldset>
+          }
+        -->
       }
     }
     <section class="actions">
