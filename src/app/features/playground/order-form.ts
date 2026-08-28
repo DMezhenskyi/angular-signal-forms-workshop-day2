@@ -15,6 +15,7 @@ import { AttendeeConfiguratorForm } from './attendee/attendee-configurator/atten
 import { customerFormSchema } from './customer/customer-form-schema';
 import { attendeeConfiguratorFormSchema } from './attendee/attendee-configurator/attendee-configurator-form-schema';
 import { companyBusinessPurchaseSchema, companyFormSchema } from './company/company-form-schema';
+import { provideErrorDisplayConfig } from '@shared/error-handling/error-display-config';
 
 
 @Component({
@@ -25,9 +26,12 @@ import { companyBusinessPurchaseSchema, companyFormSchema } from './company/comp
   providers: [
     provideSignalFormsConfig({
       classes: {
-        'invalid': ({ state }) => state().touched() && state().invalid(), 
+        'invalid': ({ state }) => state().touched() && state().invalid(),
       },
     }),
+    provideErrorDisplayConfig({
+      displayWhen: ({ state }) => state().touched() && state().invalid() && !state().pending(),
+    })
   ],
 })
 export class OrderForm {

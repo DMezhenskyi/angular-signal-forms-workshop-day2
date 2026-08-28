@@ -1,0 +1,57 @@
+:host {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  color: var(--color-text);
+  padding: calc(var(--spacing-step) * 2);
+  background-color: var(--color-primary);
+  border-radius: var(--border-radius);
+}
+
+.dynamic-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-step);
+}
+
+button {
+  background: var(--color-accent);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: var(--spacing-step) calc(var(--spacing-step) * 3);
+  transition: opacity 0.25s;
+  opacity: 0.85;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  &:hover:not(:disabled) {
+    opacity: 1;
+  }
+}
+
+.actions {
+  margin-top: var(--spacing-step);
+  .submit-button {
+    width: 100%;
+  }
+}
+
+.error-banner {
+  color: var(--color-error);
+  background-color: color-mix(in srgb, var(--color-error) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-error) 45%, transparent);
+  border-radius: var(--border-radius);
+  padding: calc(var(--spacing-step) * 1.25) calc(var(--spacing-step) * 1.5);
+  font-size: 0.8rem;
+}
+.location-picker {
+  margin-bottom: calc(var(--spacing-step) * 2);
+}

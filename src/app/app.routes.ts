@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
-import { Playground } from '@features/playground/playground';
 import { FormInspector } from '@features/form-inspector/form-inspector';
+import { DynamicFormsPlayground } from '@features/dynamic-forms-playground/dynamic-forms-playground';
 
 export const routes: Routes = [
   {
     path: '',
-    component: Playground,
+    component: DynamicFormsPlayground,
   },
   {
     path: '',

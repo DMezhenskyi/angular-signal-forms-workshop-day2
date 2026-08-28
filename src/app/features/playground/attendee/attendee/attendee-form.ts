@@ -15,11 +15,6 @@ import { FieldErrorTracker } from '@shared/error-handling/error-tracker';
     </div>
     <div class="form-field">
       <input [formField]="form().email" placeholder="Attendee's Email" type="text" class="form-control" />
-      @if (form().email().touched()) {
-        @for (error of form().email().errors(); track error.kind) {
-          <span class="error-message">{{ error.message }}</span>
-        }
-      }
     </div>
     <button (click)="remove.emit()" type="button" class="delete">-</button>
   `,

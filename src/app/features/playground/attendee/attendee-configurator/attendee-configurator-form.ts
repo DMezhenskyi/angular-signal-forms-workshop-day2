@@ -10,11 +10,6 @@ import { FieldErrorTracker } from '@shared/error-handling/error-tracker';
     <div class="form-field">
       <label for="attendee-count">Attendee Count</label>
       <input [formField]="form().count" id="attendee-count" type="number" class="form-control" />
-      @if (form().count().touched()) {
-        @for (error of form().count().errors(); track error.kind) {
-          <span class="error-message">{{ error.message }}</span>
-        }
-      }
     </div>
     <section class="attendees">
       <button type="button" (click)="addAttendee()" [disabled]="form().count().invalid()">+</button>
@@ -26,9 +21,9 @@ import { FieldErrorTracker } from '@shared/error-handling/error-tracker';
           <div class="no-data">No attendees yet...</div> 
         }      
       </div>
-        @for (error of form().list().errors(); track error.kind) {
-          <span class="error-message">{{ error.message }}</span>
-        }
+      @for (error of form().list().errors(); track error.kind) {
+        <span class="error-message">{{ error.message }}</span>
+      }
     </section>
   `,
   imports: [FormField, AttendeeForm, FieldErrorTracker],

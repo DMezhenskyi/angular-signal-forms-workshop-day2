@@ -12,11 +12,6 @@ import { FieldErrorTracker } from '@shared/error-handling/error-tracker';
       <div class="form-field">
         <label for="company-name">Company Name</label>
         <input [formField]="form().name" id="company-name" type="text" class="form-control" placeholder="E.g. Apple Inc." />
-        @if (form().name().touched()) {
-          @for (error of form().name().errors(); track error.kind) {
-            <span class="error-message">{{ error.message }}</span>
-          }
-        }
       </div>
       <div class="form-field-group">
         <div class="form-field">
@@ -35,11 +30,6 @@ import { FieldErrorTracker } from '@shared/error-handling/error-tracker';
           <div class="form-field">
             <label for="tax-id">{{taxIdRule()?.label}}</label>
             <input [formField]="form().taxId" id="tax-id" type="text" class="form-control" [placeholder]="taxIdRule()?.placeholder" />
-            @if (form().taxId().touched()) {
-              @for (error of form().taxId().errors(); track error.kind) {
-                <span class="error-message">{{ error.message }}</span>
-              }
-            }
             @for (reason of form().taxId().disabledReasons(); track reason) {
               <span class="info-message">{{ reason.message }}</span>
             }

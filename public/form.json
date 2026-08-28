@@ -1,0 +1,19 @@
+[
+  {
+    "kind": "text",
+    "type": "text",
+    "name": "fullName",
+    "label": "Full Name",
+    "placeholder": "Albert Einstein",
+    "required": true
+  },
+  {
+    "kind": "text",
+    "type": "email",
+    "name": "email",
+    "label": "Email",
+    "placeholder": "albert@example.com",
+    "required": true,
+    "email": true
+  }
+]
