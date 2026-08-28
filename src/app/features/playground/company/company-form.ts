@@ -2,6 +2,7 @@ import { Component, computed, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { Company } from './company';
 import { TAX_ID_RULE } from './company-form-schema';
+import { FieldErrorTracker } from '@shared/error-handling/error-tracker';
 
 @Component({
   selector: 'df-company-form',
@@ -50,7 +51,7 @@ import { TAX_ID_RULE } from './company-form-schema';
       </div>
     </fieldset>
   `,
-  imports: [FormField],
+  imports: [FormField, FieldErrorTracker],
   styleUrls: ['../form-core.scss'],
 })
 export class CompanyForm {

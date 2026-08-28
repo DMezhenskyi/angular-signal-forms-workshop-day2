@@ -1,18 +1,14 @@
 import { Component, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { Customer } from './customer';
+import { FieldErrorTracker } from '@shared/error-handling/error-tracker';
 
 @Component({
   selector: 'df-customer-form',
   template: `
     <div class="form-field">
       <label for="first-name">First Name</label>
-      <input [formField]="form().firstName" id="first-name" type="text" class="form-control" placeholder="E.g. Albert" />
-      @if (form().firstName().touched()) {
-        @for (error of form().firstName().errors(); track error.kind) {
-          <span class="error-message">{{ error.message }}</span>
-        }
-      }
+      <input dfFieldErrorTracker [formField]="form().firstName" id="first-name" type="text" class="form-control" placeholder="E.g. Albert" />
     </div>
     <div class="form-field">
       <label for="last-name">Last Name</label>
@@ -36,7 +32,7 @@ import { Customer } from './customer';
       }
     </div>
   `,
-  imports: [FormField],
+  imports: [FormField, FieldErrorTracker],
   styleUrls: ['../form-core.scss'],
 })
 export class CustomerForm {

@@ -1,6 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { Attendee } from '../attendee';
+import { FieldErrorTracker } from '@shared/error-handling/error-tracker';
 
 @Component({
   selector: 'df-attendee-form',
@@ -22,7 +23,7 @@ import { Attendee } from '../attendee';
     </div>
     <button (click)="remove.emit()" type="button" class="delete">-</button>
   `,
-  imports: [FormField],
+  imports: [FormField, FieldErrorTracker],
   styleUrls: ['./attendee-form.scss', '../../form-core.scss'],
 })
 export class AttendeeForm {

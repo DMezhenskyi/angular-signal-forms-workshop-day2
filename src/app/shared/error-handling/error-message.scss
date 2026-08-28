@@ -1,0 +1,21 @@
+.error {
+  color: var(--color-error);
+  font-size: 0.6rem;
+  animation: error-enter 0.2s ease-out;
+}
+
+@keyframes error-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+:host {
+  display: contents;
+}

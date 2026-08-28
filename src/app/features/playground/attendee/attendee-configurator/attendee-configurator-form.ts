@@ -2,6 +2,7 @@ import { Component, input } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { Attendees } from '../attendee';
 import { AttendeeForm } from "../attendee/attendee-form";
+import { FieldErrorTracker } from '@shared/error-handling/error-tracker';
 
 @Component({
   selector: 'df-attendee-configurator-form',
@@ -30,7 +31,7 @@ import { AttendeeForm } from "../attendee/attendee-form";
         }
     </section>
   `,
-  imports: [FormField, AttendeeForm],
+  imports: [FormField, AttendeeForm, FieldErrorTracker],
   styleUrls: ['./attendee-configurator-form.scss', '../../form-core.scss'],
 })
 export class AttendeeConfiguratorForm {
