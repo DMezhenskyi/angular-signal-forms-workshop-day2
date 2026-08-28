@@ -13,7 +13,14 @@ import { inspectFormState } from "@features/form-inspector/form-connector";
   template: `
     <form [formRoot]="form" class="dynamic-form">
     @for (config of configs(); track config.name) {
-      <!-- render inputs -->
+      @switch (config.kind) {
+        @case ('text') {
+          <div class="form-field">
+            <label [for]="config.name">{{ config.label }}</label>
+            <input [formField]="textField(config.name)" [id]="config.name" [placeholder]="config.placeholder" [type]="config.type" class="form-control" />
+          </div>
+        }
+      }
     }
     <section class="actions">
       <button class="submit-button" [disabled]="form().submitting()" type="submit">Submit</button>

@@ -1,9 +1,23 @@
-import { required, SchemaFn } from "@angular/forms/signals";
-import type { FieldConfig } from "./form-config";
-import type { DynamicModel } from "./model-builder";
+import { required, SchemaFn, SchemaPath } from '@angular/forms/signals';
+import { FieldConfig } from './form-config';
+import { DynamicModel } from './model-builder';
 
 export function buildSchema(configs: FieldConfig[]): SchemaFn<DynamicModel> {
   return (rootPath) => {
-    // build the schema based on the provided field configurations
+    for (const config of configs) {
+      const fieldPath = rootPath[config.name];
+
+      if (config.required) {
+        required(fieldPath, { message: `This field is required` });
+      }
+      
+      switch (config.kind) {
+        case 'text': {
+          const textPath = fieldPath as SchemaPath<string>;
+          // implement minLength and maxLength validation rules if they are defined in the config
+          break;
+        }
+      }
+    }
   };
 }
