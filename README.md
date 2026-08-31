@@ -35,16 +35,14 @@ and basic Signal Forms (`form()`, `schema()`, built-in validators).
 ## Running it
 
 ```bash
-pnpm install
+npm install
 git checkout lab-1   # branches: lab-N (tasks) → lab-N-solution (reference)
-pnpm start           # http://localhost:4200
+npm start           # http://localhost:4200
 ```
 
 Tasks live as `TODO: Task N` comments in the code — your IDE's TODO panel is the
 lab navigation. The app ships a **Form Inspector** panel and fake HTTP backends
 (order, VAT, email), so everything runs offline.
-
-Lab design docs: `docs/labs/lab-N.md`. Full plan: `docs/workshop-learning-plan.md`.
 
 ---
 
